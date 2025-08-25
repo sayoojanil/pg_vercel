@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Search, DollarSign, Calendar, Eye, Edit, AlertCircle } from 'lucide-react';
+import { Plus, Search, DollarSign, Calendar, Eye, Edit, AlertCircle, Trash2 } from 'lucide-react';
 import { RentDetail } from '../types';
 import { rentAPI } from '../services/api';
 import RentForm from './RentForm';
@@ -54,6 +54,17 @@ const RentPage: React.FC = () => {
     }
   };
 
+  const handleDeleteRent = async (id: string) => {
+    if (window.confirm('Are you sure you want to delete this rent record?')) {
+      try {
+        await rentAPI.delete(id);
+        await loadRentDetails();
+      } catch (error) {
+        console.error('Failed to delete rent detail:', error);
+      }
+    }
+  };
+
   const handleViewDetails = async (rent: RentDetail) => {
     const fullRent = await rentAPI.getById(rent.id);
     if (fullRent) {
@@ -70,12 +81,11 @@ const RentPage: React.FC = () => {
 
   const filteredRentDetails = rentDetails.filter(rent =>
     rent.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    rent.dueDate.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    rent.month.toLowerCase().includes(searchTerm.toLowerCase())
+    rent.id.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const totalRent = rentDetails.reduce((sum, rent) => sum + rent.amount + (rent.amount|| 0), 0);
-  const paidRent = rentDetails.filter(rent => rent.status === 'paid').reduce((sum, rent) => sum + rent.amount + (rent.amount || 0), 0);
+  const totalRent = rentDetails.reduce((sum, rent) => sum + (rent.amount || 0), 0);
+  const paidRent = rentDetails.filter(rent => rent.status === 'paid').reduce((sum, rent) => sum + (rent.amount || 0), 0);
   const pendingCount = rentDetails.filter(rent => rent.status === 'pending').length;
   const overdueCount = rentDetails.filter(rent => rent.status === 'overdue').length;
 
@@ -223,7 +233,7 @@ const RentPage: React.FC = () => {
             <input
               type="text"
               className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Search by guest name, room, or month..."
+              placeholder="Search by guest name or id..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -282,7 +292,7 @@ const RentPage: React.FC = () => {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm text-gray-900">
-                            {rent.month} {rent.duedate}
+                            {rent.duedate}
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -322,6 +332,13 @@ const RentPage: React.FC = () => {
                               title="Edit rent"
                             >
                               <Edit className="h-4 w-4" />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteRent(rent.id)}
+                              className="text-gray-400 hover:text-red-600 transition-colors"
+                              title="Delete rent"
+                            >
+                              <Trash2 className="h-4 w-4" />
                             </button>
                           </div>
                         </td>

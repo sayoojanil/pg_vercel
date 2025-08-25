@@ -1,6 +1,20 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Save } from 'lucide-react';
-import { RentDetail } from '../types';
+
+// Define the RentDetail interface, making year and month optional
+interface RentDetail {
+  id?: string;
+  name: string;
+  amount: number;
+  status: 'pending' | 'paid' | 'overdue' | 'Awaiting_payment';
+  date?: string;
+  duedate: string;
+  paymentMethod: string;
+  notes?: string;
+  notesHistory?: { date: string; note: string }[];
+  year?: number;
+  month?: string;
+}
 
 interface RentFormProps {
   rent?: RentDetail | null;
@@ -49,15 +63,14 @@ const RentForm: React.FC<RentFormProps> = ({ rent, onSubmit, onCancel }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
 
     setIsSubmitting(true);
     try {
-      const submitData = {
-        ...formData,
-        date: formData.status === 'paid' ? formData.date : undefined
-      };
+      // Exclude year and month from the submission to match backend model
+      const { year, month, ...submitData } = formData;
+      submitData.date = formData.status === 'paid' ? formData.date : undefined;
       await onSubmit(submitData);
     } catch (error) {
       console.error('Failed to submit form:', error);
@@ -74,7 +87,7 @@ const RentForm: React.FC<RentFormProps> = ({ rent, onSubmit, onCancel }) => {
       ...prev,
       [name]: ['amount', 'year'].includes(name) ? Number(value) : value
     }));
-    
+
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
@@ -180,13 +193,12 @@ const RentForm: React.FC<RentFormProps> = ({ rent, onSubmit, onCancel }) => {
                   type="number"
                   name="year"
                   id="year"
-                  min="2020"
-                  max="2030"
                   value={formData.year}
                   onChange={handleInputChange}
                   className={`block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
                     errors.year ? 'border-red-300' : ''
                   }`}
+                  placeholder="2025"
                 />
                 {errors.year && (
                   <p className="mt-1 text-sm text-red-600">{errors.year}</p>
@@ -254,7 +266,7 @@ const RentForm: React.FC<RentFormProps> = ({ rent, onSubmit, onCancel }) => {
                   <option value="pending">Pending</option>
                   <option value="paid">Paid</option>
                   <option value="overdue">Overdue</option>
-                  <option value="Awaiting_payment">Awaitning Payment</option>
+                  <option value="Awaiting_payment">Awaiting Payment</option>
                 </select>
               </div>
             </div>
@@ -337,7 +349,7 @@ const RentForm: React.FC<RentFormProps> = ({ rent, onSubmit, onCancel }) => {
                 className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               >
                 <Save className="h-4 w-4 mr-2" />
-                { isSubmitting ? 'Saving...' : (rent ? 'Update Record' : 'Add Record')}
+                {isSubmitting ? 'Saving...' : (rent ? 'Update Record' : 'Add Record')}
               </button>
             </div>
           </div>
@@ -347,4 +359,4 @@ const RentForm: React.FC<RentFormProps> = ({ rent, onSubmit, onCancel }) => {
   );
 };
 
-export default RentForm;  
+export default RentForm;

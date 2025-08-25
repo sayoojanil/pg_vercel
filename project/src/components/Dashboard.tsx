@@ -7,38 +7,7 @@ interface DashboardProps {
 
 const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
   const stats = [
-    {
-      name: 'Total Guests',
-      value: '24',
-      icon: Users,
-      color: 'bg-blue-500',
-      change: '+2',
-      changeType: 'increase'
-    },
-    {
-      name: 'Monthly Revenue',
-      value: '₹2,88,000',
-      icon: DollarSign,
-      color: 'bg-green-500',
-      change: '+12%',
-      changeType: 'increase'
-    },
-    {
-      name: 'Average Rating',
-      value: '4.8',
-      icon: Star,
-      color: 'bg-yellow-500',
-      change: '+0.2',
-      changeType: 'increase'
-    },
-    {
-      name: 'Occupancy Rate',
-      value: '96%',
-      icon: Home,
-      color: 'bg-purple-500',
-      change: '+4%',
-      changeType: 'increase'
-    }
+   
   ];
 
   const quickActions = [

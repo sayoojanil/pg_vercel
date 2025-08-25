@@ -24,7 +24,7 @@ const GuestDetails: React.FC<GuestDetailsProps> = ({ guest, onBack, onEdit }) =>
               Guest Details
             </h2>
             <p className="mt-1 text-sm text-gray-500">
-              Complete information for {guest.name}
+              Complete information of {guest.name}
             </p>
           </div>
         </div>
