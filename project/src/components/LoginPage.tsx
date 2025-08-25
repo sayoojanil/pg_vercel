@@ -3,16 +3,76 @@ import { User, Lock, Heart } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const LoginPage: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  // Initialize state with values from localStorage, if available
+  const [email, setEmail] = useState(() => localStorage.getItem('loginEmail') || '');
+  const [password, setPassword] = useState(() => localStorage.getItem('loginPassword') || '');
   const [error, setError] = useState('');
-  const [loginAttempts, setLoginAttempts] = useState(0);
-  const [isTimedOut, setIsTimedOut] = useState(false);
-  const [timeoutSeconds, setTimeoutSeconds] = useState(0);
+  const [loginAttempts, setLoginAttempts] = useState(() => 
+    parseInt(localStorage.getItem('loginAttempts') || '0', 10)
+  );
+  const [isTimedOut, setIsTimedOut] = useState(() => 
+    localStorage.getItem('isTimedOut') === 'true'
+  );
+  const [timeoutSeconds, setTimeoutSeconds] = useState(() => 
+    parseInt(localStorage.getItem('timeoutSeconds') || '0', 10)
+  );
+  const [timeoutMultiplier, setTimeoutMultiplier] = useState(() => 
+    parseInt(localStorage.getItem('timeoutMultiplier') || '1', 10)
+  );
   const { login, isLoading } = useAuth();
+
+  // Save state to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('loginEmail', email);
+  }, [email]);
+
+  useEffect(() => {
+    localStorage.setItem('loginPassword', password);
+  }, [password]);
+
+  useEffect(() => {
+    localStorage.setItem('loginAttempts', loginAttempts.toString());
+  }, [loginAttempts]);
+
+  useEffect(() => {
+    localStorage.setItem('isTimedOut', isTimedOut.toString());
+  }, [isTimedOut]);
+
+  useEffect(() => {
+    localStorage.setItem('timeoutSeconds', timeoutSeconds.toString());
+  }, [timeoutSeconds]);
+
+  useEffect(() => {
+    localStorage.setItem('timeoutMultiplier', timeoutMultiplier.toString());
+  }, [timeoutMultiplier]);
 
   // Handle timeout countdown
   useEffect(() => {
+    // Check if there's a saved timeout end time
+    const savedTimeoutEnd = localStorage.getItem('timeoutEnd');
+    if (savedTimeoutEnd && isTimedOut) {
+      const endTime = parseInt(savedTimeoutEnd, 10);
+      const currentTime = Date.now();
+      const remainingSeconds = Math.max(0, Math.floor((endTime - currentTime) / 1000));
+
+      if (remainingSeconds > 0) {
+        setTimeoutSeconds(remainingSeconds);
+      } else {
+        // Timeout has expired
+        setIsTimedOut(false);
+        setLoginAttempts(0);
+        setTimeoutSeconds(0);
+        // Clear localStorage when timeout expires
+        localStorage.removeItem('loginEmail');
+        localStorage.removeItem('loginPassword');
+        localStorage.removeItem('loginAttempts');
+        localStorage.removeItem('isTimedOut');
+        localStorage.removeItem('timeoutSeconds');
+        localStorage.removeItem('timeoutEnd');
+        // Don't reset timeoutMultiplier here to maintain progressive lockout
+      }
+    }
+
     let timer: NodeJS.Timeout;
     if (isTimedOut && timeoutSeconds > 0) {
       timer = setInterval(() => {
@@ -20,6 +80,13 @@ const LoginPage: React.FC = () => {
           if (prev <= 1) {
             setIsTimedOut(false);
             setLoginAttempts(0);
+            // Clear localStorage when timeout expires
+            localStorage.removeItem('loginEmail');
+            localStorage.removeItem('loginPassword');
+            localStorage.removeItem('loginAttempts');
+            localStorage.removeItem('isTimedOut');
+            localStorage.removeItem('timeoutSeconds');
+            localStorage.removeItem('timeoutEnd');
             return 0;
           }
           return prev - 1;
@@ -43,7 +110,11 @@ const LoginPage: React.FC = () => {
       setLoginAttempts((prev) => prev + 1);
       if (loginAttempts + 1 >= 3) {
         setIsTimedOut(true);
-        setTimeoutSeconds(60);
+        const newTimeout = 60 * timeoutMultiplier;
+        setTimeoutSeconds(newTimeout);
+        // Save timeout end time
+        localStorage.setItem('timeoutEnd', (Date.now() + newTimeout * 1000).toString());
+        setTimeoutMultiplier((prev) => prev * 2);
       }
       return;
     }
@@ -54,8 +125,21 @@ const LoginPage: React.FC = () => {
       setLoginAttempts((prev) => prev + 1);
       if (loginAttempts + 1 >= 3) {
         setIsTimedOut(true);
-        setTimeoutSeconds(60);
+        const newTimeout = 60 * timeoutMultiplier;
+        setTimeoutSeconds(newTimeout);
+        // Save timeout end time
+        localStorage.setItem('timeoutEnd', (Date.now() + newTimeout * 1000).toString());
+        setTimeoutMultiplier((prev) => prev * 2);
       }
+    } else {
+      // Clear localStorage on successful login
+      localStorage.removeItem('loginEmail');
+      localStorage.removeItem('loginPassword');
+      localStorage.removeItem('loginAttempts');
+      localStorage.removeItem('isTimedOut');
+      localStorage.removeItem('timeoutSeconds');
+      localStorage.removeItem('timeoutEnd');
+      localStorage.removeItem('timeoutMultiplier');
     }
   };
 
@@ -127,7 +211,7 @@ const LoginPage: React.FC = () => {
             onClick={handleSubmit}
             className="w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
           >
-            {isLoading ? 'Signing in...' : isTimedOut ? `Three failed login attempts detected! Please wait ${timeoutSeconds}s` : 'Sign In'}
+            {isLoading ? 'Signing in...' : isTimedOut ? `Too many attempts! Please wait ${timeoutSeconds}s` : 'Sign In'}
           </button>
           
           <div className="text-center text-xs text-red-400 mt-4">
