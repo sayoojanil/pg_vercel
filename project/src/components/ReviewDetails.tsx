@@ -49,7 +49,7 @@ const ReviewDetails: React.FC<ReviewDetailsProps> = ({ review, onBack, onEdit })
       </div>
 
       <div className="bg-white shadow rounded-lg overflow-hidden">
-        <div className="px-6 py-8 bg-gradient-to-r from-blue-500 to-blue-100">
+        <div className="px-6 py-8 bg-gradient-to-r from-blue-600 to-blue-400">
           <div className="flex items-center space-x-6">
             <div className="h-20 w-20 bg-white rounded-full flex items-center justify-center">
               <User className="h-10 w-10 text-gray-600" />
@@ -75,7 +75,7 @@ const ReviewDetails: React.FC<ReviewDetailsProps> = ({ review, onBack, onEdit })
         <div className="p-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
-              <h4 className="text-lg font-semibold text-gray-900 mb-4">Review Comment</h4>
+              <h4 className="text-lg font-semibold text-gray-900 mb-4">Reviews</h4>
               <div className="bg-gray-50 rounded-lg p-6">
                 <p className="text-gray-800 leading-relaxed text-lg">
                   "{review.comment}"
@@ -101,7 +101,7 @@ const ReviewDetails: React.FC<ReviewDetailsProps> = ({ review, onBack, onEdit })
                   <div className="flex items-center space-x-3">
                     <User className="h-5 w-5 text-gray-400" />
                     <div>
-                      <p className="text-sm text-gray-500">Room Number</p>
+                      <p className="text-sm text-gray-500">Review id</p>
                       <p className="text-gray-900">{review.id}</p>
                     </div>
                   </div>
@@ -116,7 +116,6 @@ const ReviewDetails: React.FC<ReviewDetailsProps> = ({ review, onBack, onEdit })
                     <span className="font-semibold text-blue-600">{review.rating}/5</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Status</span>
                    
                   </div>
                 </div>

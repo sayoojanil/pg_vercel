@@ -10,12 +10,10 @@ interface ReviewFormProps {
 
 const ReviewForm: React.FC<ReviewFormProps> = ({ review, onSubmit, onCancel }) => {
   const [formData, setFormData] = useState({
-    guestName: review?.guestName || '',
+    guestName: review?.name || '',
     rating: review?.rating || 5,
     comment: review?.comment || '',
-    date: review?.date || new Date().toISOString().split('T')[0],
-    roomNumber: review?.roomNumber || '',
-    verified: review?.verified || true
+    date: review?.createdAt || new Date().toISOString().split('T')[0],
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -27,7 +25,6 @@ const ReviewForm: React.FC<ReviewFormProps> = ({ review, onSubmit, onCancel }) =
     if (!formData.guestName.trim()) newErrors.guestName = 'Guest name is required';
     if (!formData.comment.trim()) newErrors.comment = 'Comment is required';
     if (!formData.date) newErrors.date = 'Date is required';
-    if (!formData.roomNumber.trim()) newErrors.roomNumber = 'Room number is required';
     if (formData.rating < 1 || formData.rating > 5) newErrors.rating = 'Rating must be between 1 and 5';
 
     setErrors(newErrors);
@@ -110,7 +107,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({ review, onSubmit, onCancel }) =
                   type="text"
                   name="guestName"
                   id="guestName"
-                  value={formData.guestName}
+                  value={formData.name}
                   onChange={handleInputChange}
                   className={`block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
                     errors.guestName ? 'border-red-300' : ''
@@ -124,28 +121,6 @@ const ReviewForm: React.FC<ReviewFormProps> = ({ review, onSubmit, onCancel }) =
             </div>
 
             <div>
-              <label htmlFor="roomNumber" className="block text-sm font-medium text-gray-700">
-                Room Number *
-              </label>
-              <div className="mt-1">
-                <input
-                  type="text"
-                  name="roomNumber"
-                  id="roomNumber"
-                  value={formData.roomNumber}
-                  onChange={handleInputChange}
-                  className={`block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
-                    errors.roomNumber ? 'border-red-300' : ''
-                  }`}
-                  placeholder="A101"
-                />
-                {errors.roomNumber && (
-                  <p className="mt-1 text-sm text-red-600">{errors.roomNumber}</p>
-                )}
-              </div>
-            </div>
-
-            <div>
               <label htmlFor="date" className="block text-sm font-medium text-gray-700">
                 Review Date *
               </label>
@@ -154,7 +129,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({ review, onSubmit, onCancel }) =
                   type="date"
                   name="date"
                   id="date"
-                  value={formData.date}
+                  value={formData.createdAt}
                   onChange={handleInputChange}
                   className={`block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
                     errors.date ? 'border-red-300' : ''

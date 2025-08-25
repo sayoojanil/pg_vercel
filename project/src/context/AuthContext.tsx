@@ -41,31 +41,41 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (email: string, password: string): Promise<boolean> => {
     setIsLoading(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Mock authentication
-    if (email === 'admin@gmail.com' && password === 'admin123456') {
-      const userData = {
-        id: '1',
-        email: 'admin@girlspg.com',
-        name: 'Admin'
-      };
+    try {
+      const response = await fetch('https://api-hammadii-6.onrender.com/loginWithEmail', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Authentication failed');
+      }
+
+      const userData: User = await response.json();
       setUser(userData);
-      // Save user data to localStorage
       localStorage.setItem('user', JSON.stringify(userData));
-      setIsLoading(false);
       return true;
+    } catch (error) {
+      console.error('Login error:', error);
+      return false;
+    } finally {
+      setIsLoading(false);
     }
-    
-    setIsLoading(false);
-    return false;
   };
 
   const logout = () => {
     setUser(null);
-    // Remove user data from localStorage
     localStorage.removeItem('user');
+    // Optional: Make API call to invalidate session
+    fetch('https://api-hammadii-6.onrender.com/loginWithEmail', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }).catch(error => console.error('Logout error:', error));
   };
 
   const value = {

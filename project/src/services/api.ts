@@ -88,3 +88,9 @@ export const rentAPI = {
     return true;
   }
 };
+
+export const loginAPI = {
+  login: async (credentials: { email: string; password: string }): Promise<{ token: string; user: { id: string; email: string } }> => {
+    return apiRequest<{ token: string; user: { id: string; email: string } }>('/loginWithEmail', 'POST', credentials);
+  }
+};

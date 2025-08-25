@@ -24,6 +24,8 @@ const RentDetails: React.FC<RentDetailsProps> = ({ rent, onBack, onEdit }) => {
       case 'paid': return 'bg-green-500';
       case 'pending': return 'bg-yellow-500';
       case 'overdue': return 'bg-red-500';
+      case 'Awaiting_payment': return 'bg-red-600';
+
       default: return 'bg-gray-500';
     }
   };
@@ -33,6 +35,7 @@ const RentDetails: React.FC<RentDetailsProps> = ({ rent, onBack, onEdit }) => {
       case 'paid': return '✓';
       case 'pending': return '⏳';
       case 'overdue': return '⚠️';
+      case 'Awaiting_payment': return '⚠️';
       default: return '?';
     }
   };
@@ -49,10 +52,10 @@ const RentDetails: React.FC<RentDetailsProps> = ({ rent, onBack, onEdit }) => {
           </button>
           <div>
             <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl">
-              Rent Rent Details
+               Rent Details
             </h2>
             <p className="mt-1 text-sm text-gray-500">
-              {new Date(rent.date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })} - {rent.id}
+              {new Date(rent.date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })} - {rent.name}
             </p>
           </div>
         </div>

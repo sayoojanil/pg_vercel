@@ -25,7 +25,7 @@ interface Guest {
   paymentCycle: 'monthly' | 'quarterly' | 'yearly';
   amountPaid: number;
   foodPreference: 'with-food' | 'without-food';
-  stayStatus: 'currently-staying' | 'left';
+  stayStatus: 'currently-staying' | 'already-left'| 'joining-soon';
   joinDate: string;
   expectedDateFrom: string;
   expectedDateTo: string;
@@ -490,7 +490,11 @@ const GuestForm: React.FC<GuestFormProps> = ({ guest, onSubmit, onCancel }) => {
                   className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 >
                   <option value="currently-staying">Currently Staying</option>
-                  <option value="left">Left</option>
+                  <option value="already-left">Already Left</option>
+                  <option value="joining-soon">Joining Soon</option>
+                    
+
+
                 </select>
               </div>
             </div>

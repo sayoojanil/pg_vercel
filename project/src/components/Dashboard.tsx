@@ -15,13 +15,17 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
     { name: 'Record Payment', action: () => onNavigate('rent'), icon: DollarSign, color: 'bg-green-500' },
     { name: 'View Reviews', action: () => onNavigate('reviews'), icon: Star, color: 'bg-yellow-500' },
   ];
+  
 
   const recentActivity = [
-    { action: 'New guest Sneha Patel checked in to Room B203', time: '2 hours ago', type: 'guest' },
-    { action: 'Rent payment received from Priya Sharma', time: '4 hours ago', type: 'payment' },
-    { action: 'New review posted by Anjali Gupta (5 stars)', time: '6 hours ago', type: 'review' },
-    { action: 'Maintenance request for Room A105', time: '1 day ago', type: 'maintenance' }
-  ];
+  { action: 'Always lock your room when leaving.', time: '2 hours ago', type: 'safety' },
+  { action: 'Do not share your room keys with strangers.', time: '4 hours ago', type: 'safety' },
+  { action: 'Switch off electrical appliances before leaving.', time: '6 hours ago', type: 'safety' },
+  { action: 'Report any suspicious activity to the admin.', time: '1 day ago', type: 'safety' },
+  { action: 'Keep emergency contact numbers handy.', time: '1 day ago', type: 'safety' }
+];
+
+  
 
   const pendingTasks = [
     { task: 'Review 3 pending rent payments', priority: 'high' },

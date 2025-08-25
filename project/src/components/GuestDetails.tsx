@@ -37,25 +37,26 @@ const GuestDetails: React.FC<GuestDetailsProps> = ({ guest, onBack, onEdit }) =>
         </button>
       </div>
 
-      <div className="bg-white shadow rounded-lg overflow-hidden">
-        <div className="px-6 py-8 bg-gradient-to-r from-blue-700 to-blue-400">
-          <div className="flex items-center space-x-6">
-            <div className="h-20 w-20 bg-white rounded-full flex items-center justify-center">
-              <User className="h-10 w-10 text-gray-600" />
-            </div>
-            <div className="text-white">
-              <h3 className="text-2xl font-bold">{guest.name}</h3>
-              <p className="text-blue-100">ID {guest.id}</p>
-              <div className="mt-2">
-                <span
-                  className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                    guest.stayStatus === 'active'
-                      ? 'bg-green-500 text-white'
-                      : 'bg-red-500 text-white'
-                  }`}
-                >
-                  {guest.stayStatus === 'active' ? 'Active' : 'Inactive'}
-                </span>
+     <div className="bg-white shadow rounded-lg overflow-hidden">
+  <div className="px-6 py-8 bg-gradient-to-r from-blue-700 to-blue-400">
+    <div className="flex items-center space-x-6">
+      <div className="h-20 w-20 bg-white rounded-full flex items-center justify-center">
+        <User className="h-10 w-10 text-gray-600" />
+      </div>
+      <div className="text-white">
+        <h3 className="text-2xl font-bold">{guest.name}</h3>
+        <p className="text-blue-100">ID {guest.id}</p>
+        <div className="mt-2">
+          <span
+            className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+              guest.stayStatus === 'currently-staying' || guest.stayStatus === 'joining-soon'
+                ? 'bg-green-500 text-white'
+                : 'bg-red-500 text-white'
+            }`}
+          >
+            {guest.stayStatus === 'currently-staying' ? 'Currently Staying' : 
+             guest.stayStatus === 'joining-soon' ? 'Joining Soon' : 'Already Left'}
+          </span>
               </div>
             </div>
           </div>
