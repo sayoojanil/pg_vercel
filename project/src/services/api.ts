@@ -1,7 +1,7 @@
 import { Guest, Review, RentDetail } from '../types';
 
 // Base URL for the API
-const BASE_URL = 'http://127.0.0.1:3000/';
+const BASE_URL = 'https://api-hammadii-6.onrender.com/';
 
 // Helper function for API requests
 async function apiRequest<T>(endpoint: string, method: string = 'GET', body?: any): Promise<T> {
