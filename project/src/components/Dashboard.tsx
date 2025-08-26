@@ -1,13 +1,55 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Users, DollarSign, Star, Home, TrendingUp, AlertCircle } from 'lucide-react';
 
 interface DashboardProps {
   onNavigate: (page: string) => void;
 }
 
+interface CheckIn {
+  name: string;
+  time: string;
+}
+
 const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
+  const [recentCheckIns, setRecentCheckIns] = useState<CheckIn[]>([
+    { name: 'Loading...', time: '' },
+  ]);
+
+  // Fetch recent check-ins from API
+  useEffect(() => {
+    const fetchRecentCheckIns = async () => {
+      try {
+        const response = await fetch('https://api-hammadii-6.onrender.com//getDetailsof/guests', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        if (!response.ok) {
+          throw new Error('Failed to fetch recent check-ins');
+        }
+        const data = await response.json();
+        // Sort in ascending order by time (newest first) and limit to 5
+        const sortedData = data
+          .sort((a: CheckIn, b: CheckIn) => 
+            new Date(b.time).getTime() - new Date(a.time).getTime()
+
+          )
+          .slice(0, 30);
+        setRecentCheckIns(sortedData);
+      } catch (error) {
+        console.error('Error fetching recent check-ins:', error);
+        setRecentCheckIns([
+          { name: 'Error loading data', time: '' },
+        ]);
+      }
+    };
+
+    fetchRecentCheckIns();
+  }, []);
+
   const stats = [
-   
+    // Stats data remains unchanged
   ];
 
   const quickActions = [
@@ -15,17 +57,14 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
     { name: 'Record Payment', action: () => onNavigate('rent'), icon: DollarSign, color: 'bg-green-500' },
     { name: 'View Reviews', action: () => onNavigate('reviews'), icon: Star, color: 'bg-yellow-500' },
   ];
-  
 
   const recentActivity = [
-  { action: 'Always lock your room when leaving.', time: '2 hours ago', type: 'safety' },
-  { action: 'Do not share your room keys with strangers.', time: '4 hours ago', type: 'safety' },
-  { action: 'Switch off electrical appliances before leaving.', time: '6 hours ago', type: 'safety' },
-  { action: 'Report any suspicious activity to the admin.', time: '1 day ago', type: 'safety' },
-  { action: 'Keep emergency contact numbers handy.', time: '1 day ago', type: 'safety' }
-];
-
-  
+    { action: 'Always lock your room when leaving.', time: '2 hours ago', type: 'safety' },
+    { action: 'Do not share your room keys with strangers.', time: '4 hours ago', type: 'safety' },
+    { action: 'Switch off electrical appliances before leaving.', time: '6 hours ago', type: 'safety' },
+    { action: 'Report any suspicious activity to the admin.', time: '1 day ago', type: 'safety' },
+    { action: 'Keep emergency contact numbers handy.', time: '1 day ago', type: 'safety' }
+  ];
 
   const pendingTasks = [
     { task: 'Review 3 pending rent payments', priority: 'high' },
@@ -87,7 +126,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
         })}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Quick Actions */}
         <div className="bg-white shadow rounded-lg">
           <div className="px-6 py-4 border-b border-gray-200">
@@ -114,10 +153,36 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
           </div>
         </div>
 
+        {/* Recent Check-Ins */}
+        <div className="bg-white shadow rounded-lg">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h3 className="text-lg font-medium text-gray-900">Our all guests</h3>
+          </div>
+          <div className="p-6">
+            <div className="flow-root">
+              <ul className="-my-5 divide-y divide-gray-200">
+                {recentCheckIns.map((checkIn, index) => (
+                  <li key={index} className="py-4">
+                    <div className="flex space-x-3">
+                      <div className="flex-shrink-0">
+                        <div className="h-2 w-2 rounded-full bg-blue-400" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm text-gray-800">{checkIn.name}</p>
+                        <p className="text-sm text-gray-500">Joined at: {checkIn.joinDate}</p>
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+
         {/* Recent Activity */}
         <div className="bg-white shadow rounded-lg">
           <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-medium text-gray-900">Recent Activity</h3>
+            <h3 className="text-lg font-medium text-gray-900">Do check</h3>
           </div>
           <div className="p-6">
             <div className="flow-root">
