@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Search, Star, Eye, Edit,  CheckCircle } from 'lucide-react';
+import { Plus, Search, Star, Eye, Edit, CheckCircle, Trash2 } from 'lucide-react';
 import { Review } from '../types';
 import { reviewAPI } from '../services/api';
 import ReviewForm from './ReviewForm';
@@ -51,6 +51,16 @@ const ReviewsPage: React.FC = () => {
       } catch (error) {
         console.error('Failed to update review:', error);
       }
+    }
+  };
+
+  const handleDeleteReview = async (id: number) => {
+    if (!window.confirm('Are you sure you want to delete this review?')) return;
+    try {
+      await reviewAPI.delete(id);
+      setReviews(reviews.filter(r => r.id !== id));
+    } catch (error) {
+      console.error('Failed to delete review:', error);
     }
   };
 
@@ -120,6 +130,7 @@ const ReviewsPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="md:flex md:items-center md:justify-between">
         <div className="flex-1 min-w-0">
           <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
@@ -140,58 +151,29 @@ const ReviewsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Stats Cards */}
+      {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="p-5">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <Star className="h-8 w-8 text-yellow-500" />
-              </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">
-                    Average Rating
-                  </dt>
-                  <dd className="text-2xl font-semibold text-gray-900">
-                    {averageRating}
-                  </dd>
-                </dl>
-              </div>
+          <div className="p-5 flex items-center">
+            <Star className="h-8 w-8 text-yellow-500" />
+            <div className="ml-5">
+              <p className="text-sm text-gray-500">Average Rating</p>
+              <p className="text-2xl font-semibold text-gray-900">{averageRating}</p>
             </div>
           </div>
         </div>
-
         <div className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="p-5">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <CheckCircle className="h-8 w-8 text-green-500" />
-              </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">
-                    Total Reviews
-                  </dt>
-                  <dd className="text-2xl font-semibold text-gray-900">
-                    {reviews.length}
-                  </dd>
-                </dl>
-              </div>
+          <div className="p-5 flex items-center">
+            <CheckCircle className="h-8 w-8 text-green-500" />
+            <div className="ml-5">
+              <p className="text-sm text-gray-500">Total Reviews</p>
+              <p className="text-2xl font-semibold text-gray-900">{reviews.length}</p>
             </div>
           </div>
         </div>
+      </div>
 
-      
-              
-                 
-
-              
-            </div>
-          
-        
-      
-
+      {/* Reviews List */}
       <div className="bg-white shadow rounded-lg">
         <div className="p-6 border-b border-gray-200">
           <div className="relative">
@@ -200,8 +182,8 @@ const ReviewsPage: React.FC = () => {
             </div>
             <input
               type="text"
-              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Search reviews by guest name, room, or content..."
+              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Search reviews..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -209,11 +191,9 @@ const ReviewsPage: React.FC = () => {
         </div>
 
         {loading ? (
-          <div className="p-8 text-center">
-            <div className="animate-pulse">
-              <div className="h-4 bg-gray-300 rounded w-1/4 mx-auto mb-4"></div>
-              <div className="h-4 bg-gray-300 rounded w-1/2 mx-auto"></div>
-            </div>
+          <div className="p-8 text-center animate-pulse">
+            <div className="h-4 bg-gray-300 rounded w-1/4 mx-auto mb-4"></div>
+            <div className="h-4 bg-gray-300 rounded w-1/2 mx-auto"></div>
           </div>
         ) : (
           <div className="overflow-hidden">
@@ -227,6 +207,7 @@ const ReviewsPage: React.FC = () => {
                 {filteredReviews.map((review) => (
                   <div key={review.id} className="p-6 hover:bg-gray-50 transition-colors">
                     <div className="flex items-start space-x-4">
+                      {/* Avatar */}
                       <div className="flex-shrink-0">
                         <div className="h-10 w-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
                           <span className="text-sm font-medium text-white">
@@ -234,46 +215,42 @@ const ReviewsPage: React.FC = () => {
                           </span>
                         </div>
                       </div>
-                      
+
+                      {/* Content */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
-                          <div>
-                            <h3 className="text-lg font-semibold text-gray-900">
-                              {review.name}
-                            </h3>
-                          </div>
-                        
-                            <div className="flex space-x-1">
-                              <button
-                                onClick={() => handleViewDetails(review)}
-                                className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
-                                title="View details"
-                              >
-                                <Eye className="h-4 w-4" />
-                              </button>
-                              <button
-                                onClick={() => handleEditClick(review)}
-                                className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
-                                title="Edit review"
-                              >
-                                <Edit className="h-4 w-4" />
-                              </button>
-                            
+                          <h3 className="text-lg font-semibold text-gray-900">{review.name}</h3>
+                          <div className="flex space-x-1">
+                            <button
+                              onClick={() => handleViewDetails(review)}
+                              className="p-2 text-gray-400 hover:text-gray-600"
+                              title="View details"
+                            >
+                              <Eye className="h-4 w-4" />
+                            </button>
+                            <button
+                              onClick={() => handleEditClick(review)}
+                              className="p-2 text-gray-400 hover:text-gray-600"
+                              title="Edit review"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteReview(review.id)}
+                              className="p-2 text-red-400 hover:text-red-600"
+                              title="Delete review"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
                           </div>
                         </div>
-                        
+
                         <div className="mt-2 flex items-center space-x-2">
-                          <div className="flex items-center">
-                            {renderStars(review.rating)}
-                          </div>
+                          <div className="flex">{renderStars(review.rating)}</div>
                           <span className="text-sm text-gray-600">({review.rating}/5)</span>
                         </div>
-                        
-                        <p className="mt-3 text-gray-700 line-clamp-3">
-                          {review.comment}
-                        </p>
-                        
-                       
+
+                        <p className="mt-3 text-gray-700 line-clamp-3">{review.comment}</p>
                       </div>
                     </div>
                   </div>
