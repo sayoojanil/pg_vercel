@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Menu, X, LogOut, Home, Users, DollarSign, Star } from 'lucide-react';
+import { Menu, X, LogOut, Home, Users, DollarSign, Star, User } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 interface LayoutProps {
@@ -17,6 +17,7 @@ const Layout: React.FC<LayoutProps> = ({ children, currentPage, onNavigate }) =>
     { name: 'Guests', icon: Users, key: 'guests' },
     { name: 'Rent Details', icon: DollarSign, key: 'rent' },
     { name: 'Reviews', icon: Star, key: 'reviews' },
+    { name: 'Profile', icon: User, key: 'profile' },
   ];
 
   const handleNavigation = (page: string) => {
@@ -60,7 +61,7 @@ const Layout: React.FC<LayoutProps> = ({ children, currentPage, onNavigate }) =>
             
             <div className="flex items-center">
               <div className="hidden md:flex items-center space-x-4">
-                <span className="text-sm text-gray-700">Welcome, {user?.name}</span>
+                <span className="text-sm text-gray-700"> {user?.name}</span>
                 <button
                   onClick={logout}
                   className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-gray-500 hover:text-gray-700 transition-colors"

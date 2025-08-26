@@ -9,11 +9,11 @@ interface ReviewFormProps {
 }
 
 const ReviewForm: React.FC<ReviewFormProps> = ({ review, onSubmit, onCancel }) => {
-  const [formData, setFormData] = useState({
-    guestName: review?.name || '',
+  const [formData, setFormData] = useState<Omit<Review, 'id'>>({
+    name: review?.name || '',
     rating: review?.rating || 5,
     comment: review?.comment || '',
-    date: review?.createdAt || new Date().toISOString().split('T')[0],
+    createdAt: review?.createdAt || new Date().toISOString().split('T')[0],
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -22,9 +22,9 @@ const ReviewForm: React.FC<ReviewFormProps> = ({ review, onSubmit, onCancel }) =
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.guestName.trim()) newErrors.guestName = 'Guest name is required';
+    if (!formData.name.trim()) newErrors.name = 'Guest name is required';
     if (!formData.comment.trim()) newErrors.comment = 'Comment is required';
-    if (!formData.date) newErrors.date = 'Date is required';
+    if (!formData.createdAt) newErrors.createdAt = 'Date is required';
     if (formData.rating < 1 || formData.rating > 5) newErrors.rating = 'Rating must be between 1 and 5';
 
     setErrors(newErrors);
@@ -46,13 +46,11 @@ const ReviewForm: React.FC<ReviewFormProps> = ({ review, onSubmit, onCancel }) =
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'number' ? Number(value) : 
-              type === 'checkbox' ? (e.target as HTMLInputElement).checked : 
-              value
+      [name]: type === 'number' ? Number(value) : value
     }));
     
     // Clear error when user starts typing
@@ -98,49 +96,52 @@ const ReviewForm: React.FC<ReviewFormProps> = ({ review, onSubmit, onCancel }) =
       <div className="bg-white shadow rounded-lg">
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Guest Name */}
             <div>
-              <label htmlFor="guestName" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
                 Guest Name *
               </label>
               <div className="mt-1">
                 <input
                   type="text"
-                  name="guestName"
-                  id="guestName"
+                  name="name"
+                  id="name"
                   value={formData.name}
                   onChange={handleInputChange}
                   className={`block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
-                    errors.guestName ? 'border-red-300' : ''
+                    errors.name ? 'border-red-300' : ''
                   }`}
                   placeholder="Enter guest's name"
                 />
-                {errors.guestName && (
-                  <p className="mt-1 text-sm text-red-600">{errors.guestName}</p>
+                {errors.name && (
+                  <p className="mt-1 text-sm text-red-600">{errors.name}</p>
                 )}
               </div>
             </div>
 
+            {/* Review Date */}
             <div>
-              <label htmlFor="date" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="createdAt" className="block text-sm font-medium text-gray-700">
                 Review Date *
               </label>
               <div className="mt-1">
                 <input
                   type="date"
-                  name="date"
-                  id="date"
-                  value={formData.createdAt}
+                  name="createdAt"
+                  id="createdAt"
+                  value={formData.createdAt.split('T')[0]}
                   onChange={handleInputChange}
                   className={`block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
-                    errors.date ? 'border-red-300' : ''
+                    errors.createdAt ? 'border-red-300' : ''
                   }`}
                 />
-                {errors.date && (
-                  <p className="mt-1 text-sm text-red-600">{errors.date}</p>
+                {errors.createdAt && (
+                  <p className="mt-1 text-sm text-red-600">{errors.createdAt}</p>
                 )}
               </div>
             </div>
 
+            {/* Rating */}
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Rating *
@@ -161,6 +162,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({ review, onSubmit, onCancel }) =
             </div>
           </div>
 
+          {/* Comment */}
           <div>
             <label htmlFor="comment" className="block text-sm font-medium text-gray-700">
               Comment *
@@ -183,20 +185,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({ review, onSubmit, onCancel }) =
             </div>
           </div>
 
-          <div className="flex items-center">
-            <input
-              id="verified"
-              name="verified"
-              type="checkbox"
-              checked={formData.verified}
-              onChange={handleInputChange}
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-            />
-            <label htmlFor="verified" className="ml-2 block text-sm text-gray-900">
-              Mark as verified review
-            </label>
-          </div>
-
+          {/* Buttons */}
           <div className="pt-6 border-t border-gray-200">
             <div className="flex justify-end space-x-3">
               <button

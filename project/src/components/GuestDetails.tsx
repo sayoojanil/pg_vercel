@@ -1,6 +1,7 @@
 import React from 'react';
-import { ArrowLeft, Edit, User, Mail, Phone, Calendar, MapPin, DollarSign, Shield, FileText, Users, Utensils } from 'lucide-react';
+import { ArrowLeft, Edit, User, Mail, Phone, Calendar, MapPin, DollarSign, Shield, FileText, Users, Utensils, Download } from 'lucide-react';
 import { Guest } from '../types';
+import { jsPDF } from 'jspdf';
 
 interface GuestDetailsProps {
   guest: Guest;
@@ -9,6 +10,81 @@ interface GuestDetailsProps {
 }
 
 const GuestDetails: React.FC<GuestDetailsProps> = ({ guest, onBack, onEdit }) => {
+  const handleDownloadPDF = () => {
+    const doc = new jsPDF();
+    
+    // Set document properties
+    doc.setFontSize(18);
+    doc.text('Guest Details', 20, 20);
+    
+    // Guest Header
+    doc.setFontSize(14);
+    doc.text(`Name: ${guest.name}`, 20, 40);
+    doc.text(`ID: ${guest.id}`, 20, 50);
+    doc.text(`Status: ${guest.stayStatus === 'currently-staying' ? 'Currently Staying' : 
+                      guest.stayStatus === 'joining-soon' ? 'Joining Soon' : 'Already Left'}`, 20, 60);
+
+    // Personal Information
+    doc.setFontSize(12);
+    doc.text('Personal Information', 20, 80);
+    doc.setFontSize(10);
+    doc.text(`Email: ${guest.email}`, 20, 90);
+    doc.text(`Phone: ${guest.contact}`, 20, 100);
+    doc.text(`Date of Birth: ${new Date(guest.dob).toLocaleDateString('en-US', {
+      year: 'numeric', month: 'long', day: 'numeric'
+    })}`, 20, 110);
+    doc.text(`Location: ${guest.location}`, 20, 120);
+
+    // Guardian Information
+    doc.setFontSize(12);
+    doc.text('Guardian Information', 20, 140);
+    doc.setFontSize(10);
+    doc.text(`Guardian Name: ${guest.guardianName}`, 20, 150);
+    doc.text(`Guardian Contact: ${guest.guardianContact}`, 20, 160);
+
+    // Emergency Contact
+    doc.setFontSize(12);
+    doc.text('Emergency Contact', 20, 180);
+    doc.setFontSize(10);
+    doc.text(`Name: ${guest.emergencyContactName}`, 20, 190);
+    doc.text(`Relation: ${guest.emergencyContactRelation}`, 20, 200);
+    doc.text(`Number: ${guest.emergencyContactNumber}`, 20, 210);
+
+    // Accommodation Details
+    doc.setFontSize(12);
+    doc.text('Accommodation Details', 20, 230);
+    doc.setFontSize(10);
+    doc.text(`Join Date: ${new Date(guest.joinDate).toLocaleDateString('en-US', {
+      year: 'numeric', month: 'long', day: 'numeric'
+    })}`, 20, 240);
+    doc.text(`Expected Stay From: ${new Date(guest.expectedDateFrom).toLocaleDateString('en-US', {
+      year: 'numeric', month: 'long', day: 'numeric'
+    })}`, 20, 250);
+    doc.text(`Expected Stay To: ${new Date(guest.expectedDateTo).toLocaleDateString('en-US', {
+      year: 'numeric', month: 'long', day: 'numeric'
+    })}`, 20, 260);
+    doc.text(`Amount Paid: ₹${guest.amountPaid.toLocaleString()}`, 20, 270);
+    doc.text(`Payment Cycle: ${guest.paymentCycle}`, 20, 280);
+
+    // Additional Information
+    doc.setFontSize(12);
+    doc.text('Additional Information', 20, 300);
+    doc.setFontSize(10);
+    doc.text(`Occupation/Course: ${guest.occupationCourse}`, 20, 310);
+    doc.text(`Food Preference: ${guest.foodPreference}`, 20, 320);
+
+    // Quick Stats
+    doc.setFontSize(12);
+    doc.text('Quick Stats', 20, 340);
+    doc.setFontSize(10);
+    doc.text(`Days as Shyamaprabha member: ${Math.floor(
+      (new Date().getTime() - new Date(guest.joinDate).getTime()) / (1000 * 60 * 60 * 24)
+    )}`, 20, 350);
+
+    // Save the PDF
+    doc.save(`${guest.name}_details.pdf`);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -28,35 +104,44 @@ const GuestDetails: React.FC<GuestDetailsProps> = ({ guest, onBack, onEdit }) =>
             </p>
           </div>
         </div>
-        <button
-          onClick={onEdit}
-          className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all"
-        >
-          <Edit className="h-4 w-4 mr-2" />
-          Edit Guest
-        </button>
+        <div className="flex space-x-4">
+          <button
+            onClick={onEdit}
+            className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all"
+          >
+            <Edit className="h-4 w-4 mr-2" />
+            Edit Guest
+          </button>
+          <button
+            onClick={handleDownloadPDF}
+            className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all"
+          >
+            <Download className="h-4 w-4 mr-2" />
+            Download PDF
+          </button>
+        </div>
       </div>
 
-     <div className="bg-white shadow rounded-lg overflow-hidden">
-  <div className="px-6 py-8 bg-gradient-to-r from-blue-700 to-blue-400">
-    <div className="flex items-center space-x-6">
-      <div className="h-20 w-20 bg-white rounded-full flex items-center justify-center">
-        <User className="h-10 w-10 text-gray-600" />
-      </div>
-      <div className="text-white">
-        <h3 className="text-2xl font-bold">{guest.name}</h3>
-        <p className="text-blue-100">ID {guest.id}</p>
-        <div className="mt-2">
-          <span
-            className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-              guest.stayStatus === 'currently-staying' || guest.stayStatus === 'joining-soon'
-                ? 'bg-green-500 text-white'
-                : 'bg-red-500 text-white'
-            }`}
-          >
-            {guest.stayStatus === 'currently-staying' ? 'Currently Staying' : 
-             guest.stayStatus === 'joining-soon' ? 'Joining Soon' : 'Already Left'}
-          </span>
+      <div className="bg-white shadow rounded-lg overflow-hidden">
+        <div className="px-6 py-8 bg-gradient-to-r from-blue-700 to-blue-400">
+          <div className="flex items-center space-x-6">
+            <div className="h-20 w-20 bg-white rounded-full flex items-center justify-center">
+              <User className="h-10 w-10 text-gray-600" />
+            </div>
+            <div className="text-white">
+              <h3 className="text-2xl font-bold">{guest.name}</h3>
+              <p className="text-blue-100">ID {guest.id}</p>
+              <div className="mt-2">
+                <span
+                  className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                    guest.stayStatus === 'currently-staying' || guest.stayStatus === 'joining-soon'
+                      ? 'bg-green-500 text-white'
+                      : 'bg-red-500 text-white'
+                  }`}
+                >
+                  {guest.stayStatus === 'currently-staying' ? 'Currently Staying' : 
+                   guest.stayStatus === 'joining-soon' ? 'Joining Soon' : 'Already Left'}
+                </span>
               </div>
             </div>
           </div>
@@ -271,7 +356,6 @@ const GuestDetails: React.FC<GuestDetailsProps> = ({ guest, onBack, onEdit }) =>
                     </p>
                     <p className="text-sm text-gray-500">Days as shyamaprabha member</p>
                   </div>
-                 
                 </div>
               </div>
             </div>

@@ -6,6 +6,7 @@ import Dashboard from './components/Dashboard';
 import GuestsPage from './components/GuestsPage';
 import ReviewsPage from './components/ReviewsPage';
 import RentPage from './components/RentPage';
+import ProfilePage from './components/ProfilePage';
 
 function AppContent() {
   const { user } = useAuth();
@@ -23,6 +24,8 @@ function AppContent() {
         return <ReviewsPage />;
       case 'rent':
         return <RentPage />;
+      case 'profile':
+        return <ProfilePage />;
       default:
         return <Dashboard onNavigate={setCurrentPage} />;
     }

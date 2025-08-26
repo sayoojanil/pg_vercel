@@ -170,6 +170,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                       <div className="min-w-0 flex-1">
                         <p className="text-sm text-gray-800">{checkIn.name}</p>
                         <p className="text-sm text-gray-500">Joined at: {checkIn.joinDate}</p>
+                         <p className="text-sm text-gray-500">Contact : {checkIn.contact}</p>
                       </div>
                     </div>
                   </li>
