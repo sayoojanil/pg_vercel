@@ -1,29 +1,38 @@
 import React, { useState } from 'react';
 import { Menu, X, LogOut, Home, Users, DollarSign, Star, User } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 interface LayoutProps {
   children: React.ReactNode;
-  currentPage: string;
-  onNavigate: (page: string) => void;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children, currentPage, onNavigate }) => {
+const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const navigation = [
-    { name: 'Dashboard', icon: Home, key: 'dashboard' },
-    { name: 'Guests', icon: Users, key: 'guests' },
-    { name: 'Rent Details', icon: DollarSign, key: 'rent' },
-    { name: 'Reviews', icon: Star, key: 'reviews' },
-    { name: 'Profile', icon: User, key: 'profile' },
+    { name: 'Dashboard', icon: Home, path: '/dashboard' },
+    { name: 'Guests', icon: Users, path: '/guests' },
+    { name: 'Rent Details', icon: DollarSign, path: '/rent' },
+    { name: 'Reviews', icon: Star, path: '/reviews' },
+    { name: 'Profile', icon: User, path: '/profile' },
   ];
 
-  const handleNavigation = (page: string) => {
-    onNavigate(page);
+  const handleNavigation = (path: string) => {
+    navigate(path);
     setIsMobileMenuOpen(false);
   };
+
+  const getCurrentPage = () => {
+    const path = location.pathname;
+    if (path === '/' || path === '/dashboard') return '/dashboard';
+    return path;
+  };
+
+  const currentPage = getCurrentPage();
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -31,22 +40,25 @@ const Layout: React.FC<LayoutProps> = ({ children, currentPage, onNavigate }) =>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
-              <div className="flex-shrink-0 flex items-center">
+              <button
+                onClick={() => handleNavigation('/dashboard')}
+                className="flex-shrink-0 flex items-center focus:outline-none"
+              >
                 <div className="h-8 w-8 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
                   <Home className="h-5 w-5 text-white" />
                 </div>
                 <span className="ml-2 text-xl font-bold text-gray-900">Shyamaprabha</span>
-              </div>
+              </button>
               
               <nav className="hidden md:ml-6 md:flex md:space-x-8">
                 {navigation.map((item) => {
                   const Icon = item.icon;
                   return (
                     <button
-                      key={item.key}
-                      onClick={() => handleNavigation(item.key)}
+                      key={item.path}
+                      onClick={() => handleNavigation(item.path)}
                       className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors ${
-                        currentPage === item.key
+                        currentPage === item.path
                           ? 'border-blue-500 text-blue-600'
                           : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                       }`}
@@ -92,10 +104,10 @@ const Layout: React.FC<LayoutProps> = ({ children, currentPage, onNavigate }) =>
                 const Icon = item.icon;
                 return (
                   <button
-                    key={item.key}
-                    onClick={() => handleNavigation(item.key)}
+                    key={item.path}
+                    onClick={() => handleNavigation(item.path)}
                     className={`w-full flex items-center px-3 py-2 text-base font-medium transition-colors ${
-                      currentPage === item.key
+                      currentPage === item.path
                         ? 'text-blue-600 bg-blue-50 border-r-4 border-blue-500'
                         : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                     }`}

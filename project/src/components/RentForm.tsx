@@ -1,20 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Save } from 'lucide-react';
-
-// Define the RentDetail interface, making year and month optional
-interface RentDetail {
-  id?: string;
-  name: string;
-  amount: number;
-  status: 'pending' | 'paid' | 'overdue' | 'Awaiting_payment';
-  date?: string;
-  duedate: string;
-  paymentMethod: string;
-  notes?: string;
-  notesHistory?: { date: string; note: string }[];
-  year?: number;
-  month?: string;
-}
+import { RentDetail } from '../types';
+import { rentAPI } from '../services/api';
 
 interface RentFormProps {
   rent?: RentDetail | null;
@@ -25,19 +12,17 @@ interface RentFormProps {
 const RentForm: React.FC<RentFormProps> = ({ rent, onSubmit, onCancel }) => {
   const [formData, setFormData] = useState({
     name: rent?.name || '',
-    amount: rent?.amount || 0,
+    amount: rent?.amount || '',
     status: rent?.status || 'pending' as const,
-    date: rent?.date || '',
-    duedate: rent?.duedate || new Date().toISOString().split('T')[0],
+    date: rent?.date || 0,
+    dueDate: rent?.dueDate || new Date().toISOString().split('T')[0],
     paymentMethod: rent?.paymentMethod || '',
-    notes: rent?.notes || '',
-    notesHistory: rent?.notesHistory || [],
-    year: rent?.year || new Date().getFullYear(),
-    month: rent?.month || ''
+    notes: rent?.notes || ''
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const months = [
     'January', 'February', 'March', 'April', 'May', 'June',
@@ -48,10 +33,8 @@ const RentForm: React.FC<RentFormProps> = ({ rent, onSubmit, onCancel }) => {
     const newErrors: Record<string, string> = {};
 
     if (!formData.name.trim()) newErrors.name = 'Guest name is required';
-    if (formData.amount <= 0) newErrors.amount = 'Amount must be greater than 0';
-    if (!formData.duedate) newErrors.duedate = 'Due date is required';
-    if (!formData.month) newErrors.month = 'Month is required';
-    if (formData.year < 2020 || formData.year > 2030) newErrors.year = 'Year must be between 2020 and 2030';
+    if (parseFloat(formData.amount.toString()) <= 0) newErrors.amount = 'Amount must be greater than 0';
+    if (!formData.dueDate) newErrors.dueDate = 'Due date is required';
     if (formData.status === 'paid' && !formData.date) {
       newErrors.date = 'Paid date is required when status is paid';
     }
@@ -68,16 +51,43 @@ const RentForm: React.FC<RentFormProps> = ({ rent, onSubmit, onCancel }) => {
 
     setIsSubmitting(true);
     try {
-      // Exclude year and month from the submission to match backend model
-      const { year, month, ...submitData } = formData;
-      submitData.date = formData.status === 'paid' ? formData.date : undefined;
-      await onSubmit(submitData);
+      const submitData = {
+        ...formData,
+        amount: parseFloat(formData.amount.toString()) || 0,
+        date: formData.status === 'paid' && formData.date ? formData.date : 0,
+      };
+
+      if (rent && rent.id) {
+        // Update existing record
+        await rentAPI.update(rent.id, submitData);
+        setSuccessMessage('Rent details updated successfully!');
+      } else {
+        // Create new record
+        await onSubmit(submitData);
+        setSuccessMessage('Rent record added successfully!');
+      }
+
+      // Close the form after a short delay
+      setTimeout(() => {
+        onCancel();
+      }, 1500);
     } catch (error) {
       console.error('Failed to submit form:', error);
+      setSuccessMessage(null); // Clear success message on error
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  // Clear success message after 3 seconds
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => {
+        setSuccessMessage(null);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -85,7 +95,8 @@ const RentForm: React.FC<RentFormProps> = ({ rent, onSubmit, onCancel }) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: ['amount', 'year'].includes(name) ? Number(value) : value
+      [name]: ['amount', 'date'].includes(name) ?
+        (name === 'amount' ? parseFloat(value) || 0 : (name === 'date' && value ? new Date(value).getTime() : 0)) : value
     }));
 
     if (errors[name]) {
@@ -111,6 +122,12 @@ const RentForm: React.FC<RentFormProps> = ({ rent, onSubmit, onCancel }) => {
           </p>
         </div>
       </div>
+
+      {successMessage && (
+        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative">
+          <span className="block sm:inline">{successMessage}</span>
+        </div>
+      )}
 
       <div className="bg-white shadow rounded-lg">
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
@@ -160,53 +177,6 @@ const RentForm: React.FC<RentFormProps> = ({ rent, onSubmit, onCancel }) => {
             </div>
 
             <div>
-              <label htmlFor="month" className="block text-sm font-medium text-gray-700">
-                Month *
-              </label>
-              <div className="mt-1">
-                <select
-                  name="month"
-                  id="month"
-                  value={formData.month}
-                  onChange={handleInputChange}
-                  className={`block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
-                    errors.month ? 'border-red-300' : ''
-                  }`}
-                >
-                  <option value="">Select Month</option>
-                  {months.map(month => (
-                    <option key={month} value={month}>{month}</option>
-                  ))}
-                </select>
-                {errors.month && (
-                  <p className="mt-1 text-sm text-red-600">{errors.month}</p>
-                )}
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="year" className="block text-sm font-medium text-gray-700">
-                Year *
-              </label>
-              <div className="mt-1">
-                <input
-                  type="number"
-                  name="year"
-                  id="year"
-                  value={formData.year}
-                  onChange={handleInputChange}
-                  className={`block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
-                    errors.year ? 'border-red-300' : ''
-                  }`}
-                  placeholder="2025"
-                />
-                {errors.year && (
-                  <p className="mt-1 text-sm text-red-600">{errors.year}</p>
-                )}
-              </div>
-            </div>
-
-            <div>
               <label htmlFor="amount" className="block text-sm font-medium text-gray-700">
                 Amount (₹) *
               </label>
@@ -231,22 +201,22 @@ const RentForm: React.FC<RentFormProps> = ({ rent, onSubmit, onCancel }) => {
             </div>
 
             <div>
-              <label htmlFor="duedate" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="dueDate" className="block text-sm font-medium text-gray-700">
                 Due Date *
               </label>
               <div className="mt-1">
                 <input
                   type="date"
-                  name="duedate"
-                  id="duedate"
-                  value={formData.duedate}
+                  name="dueDate"
+                  id="dueDate"
+                  value={formData.dueDate}
                   onChange={handleInputChange}
                   className={`block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
-                    errors.duedate ? 'border-red-300' : ''
+                    errors.dueDate ? 'border-red-300' : ''
                   }`}
                 />
-                {errors.duedate && (
-                  <p className="mt-1 text-sm text-red-600">{errors.duedate}</p>
+                {errors.dueDate && (
+                  <p className="mt-1 text-sm text-red-600">{errors.dueDate}</p>
                 )}
               </div>
             </div>
@@ -266,7 +236,6 @@ const RentForm: React.FC<RentFormProps> = ({ rent, onSubmit, onCancel }) => {
                   <option value="pending">Pending</option>
                   <option value="paid">Paid</option>
                   <option value="overdue">Overdue</option>
-                  <option value="Awaiting_payment">Awaiting Payment</option>
                 </select>
               </div>
             </div>
@@ -281,7 +250,7 @@ const RentForm: React.FC<RentFormProps> = ({ rent, onSubmit, onCancel }) => {
                     type="date"
                     name="date"
                     id="date"
-                    value={formData.date}
+                    value={formData.date ? new Date(formData.date).toISOString().split('T')[0] : ''}
                     onChange={handleInputChange}
                     className={`block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
                       errors.date ? 'border-red-300' : ''
@@ -312,25 +281,10 @@ const RentForm: React.FC<RentFormProps> = ({ rent, onSubmit, onCancel }) => {
             </div>
           </div>
 
-          {formData.notesHistory.length > 0 && (
-            <div className="bg-gray-50 rounded-lg p-4">
-              <h4 className="text-sm font-medium text-gray-900 mb-2">Notes History</h4>
-              <div className="space-y-2">
-                {formData.notesHistory.map((note, index) => (
-                  <div key={index} className="border-b border-gray-200 py-2">
-                    <p className="text-sm text-gray-600">
-                      {new Date(note.date).toLocaleDateString()} - {note.note}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
           <div className="bg-gray-50 rounded-lg p-4">
             <h4 className="text-sm font-medium text-gray-900 mb-2">Total Amount</h4>
             <p className="text-2xl font-bold text-blue-600">
-              ₹{formData.amount.toLocaleString()}
+              ₹{parseFloat(formData.amount.toString()).toLocaleString()}
             </p>
           </div>
 

@@ -14,9 +14,75 @@ const ReviewsPage: React.FC = () => {
   const [selectedReview, setSelectedReview] = useState<Review | null>(null);
   const [isEditing, setIsEditing] = useState(false);
 
+  // Restore view state from localStorage on mount
   useEffect(() => {
+    const view = localStorage.getItem('reviewView');
+    const reviewId = localStorage.getItem('selectedReviewId');
+    const editing = localStorage.getItem('isEditing') === 'true';
+
+    if (view === 'form') {
+      setShowForm(true);
+      setIsEditing(editing);
+      if (editing && reviewId) {
+        // Fetch the review for editing
+        const fetchReview = async () => {
+          try {
+            const review = await reviewAPI.getById(Number(reviewId));
+            if (review) {
+              setSelectedReview(review);
+            }
+          } catch (error) {
+            console.error('Failed to fetch review for editing:', error);
+            // Reset to list view if fetch fails
+            localStorage.setItem('reviewView', 'list');
+            setShowForm(false);
+            setIsEditing(false);
+          }
+        };
+        fetchReview();
+      }
+    } else if (view === 'details' && reviewId) {
+      // Fetch the review for details view
+      const fetchReview = async () => {
+        try {
+          const review = await reviewAPI.getById(Number(reviewId));
+          if (review) {
+            setSelectedReview(review);
+            setShowDetails(true);
+          }
+        } catch (error) {
+          console.error('Failed to fetch review for details:', error);
+          // Reset to list view if fetch fails
+          localStorage.setItem('reviewView', 'list');
+          setShowDetails(false);
+        }
+      };
+      fetchReview();
+    }
+
+    // Load reviews for the list view
     loadReviews();
   }, []);
+
+  // Update localStorage when view changes
+  useEffect(() => {
+    if (showForm) {
+      localStorage.setItem('reviewView', 'form');
+      localStorage.setItem('isEditing', isEditing.toString());
+      if (isEditing && selectedReview) {
+        localStorage.setItem('selectedReviewId', selectedReview.id.toString());
+      } else {
+        localStorage.removeItem('selectedReviewId');
+      }
+    } else if (showDetails && selectedReview) {
+      localStorage.setItem('reviewView', 'details');
+      localStorage.setItem('selectedReviewId', selectedReview.id.toString());
+    } else {
+      localStorage.setItem('reviewView', 'list');
+      localStorage.removeItem('selectedReviewId');
+      localStorage.removeItem('isEditing');
+    }
+  }, [showForm, showDetails, selectedReview, isEditing]);
 
   const loadReviews = async () => {
     setLoading(true);
@@ -35,6 +101,11 @@ const ReviewsPage: React.FC = () => {
       await reviewAPI.create(reviewData);
       await loadReviews();
       setShowForm(false);
+      setSelectedReview(null);
+      setIsEditing(false);
+      localStorage.setItem('reviewView', 'list');
+      localStorage.removeItem('selectedReviewId');
+      localStorage.removeItem('isEditing');
     } catch (error) {
       console.error('Failed to add review:', error);
     }
@@ -48,6 +119,9 @@ const ReviewsPage: React.FC = () => {
         setShowForm(false);
         setSelectedReview(null);
         setIsEditing(false);
+        localStorage.setItem('reviewView', 'list');
+        localStorage.removeItem('selectedReviewId');
+        localStorage.removeItem('isEditing');
       } catch (error) {
         console.error('Failed to update review:', error);
       }
@@ -59,16 +133,28 @@ const ReviewsPage: React.FC = () => {
     try {
       await reviewAPI.delete(id);
       setReviews(reviews.filter(r => r.id !== id));
+      if (selectedReview?.id === id) {
+        setShowDetails(false);
+        setSelectedReview(null);
+        localStorage.setItem('reviewView', 'list');
+        localStorage.removeItem('selectedReviewId');
+      }
     } catch (error) {
       console.error('Failed to delete review:', error);
     }
   };
 
   const handleViewDetails = async (review: Review) => {
-    const fullReview = await reviewAPI.getById(review.id);
-    if (fullReview) {
-      setSelectedReview(fullReview);
-      setShowDetails(true);
+    try {
+      const fullReview = await reviewAPI.getById(review.id);
+      if (fullReview) {
+        setSelectedReview(fullReview);
+        setShowDetails(true);
+        localStorage.setItem('reviewView', 'details');
+        localStorage.setItem('selectedReviewId', review.id.toString());
+      }
+    } catch (error) {
+      console.error('Failed to fetch review details:', error);
     }
   };
 
@@ -76,6 +162,9 @@ const ReviewsPage: React.FC = () => {
     setSelectedReview(review);
     setIsEditing(true);
     setShowForm(true);
+    localStorage.setItem('reviewView', 'form');
+    localStorage.setItem('isEditing', 'true');
+    localStorage.setItem('selectedReviewId', review.id.toString());
   };
 
   const filteredReviews = reviews.filter(review =>
@@ -107,6 +196,9 @@ const ReviewsPage: React.FC = () => {
           setShowForm(false);
           setSelectedReview(null);
           setIsEditing(false);
+          localStorage.setItem('reviewView', 'list');
+          localStorage.removeItem('selectedReviewId');
+          localStorage.removeItem('isEditing');
         }}
       />
     );
@@ -119,6 +211,8 @@ const ReviewsPage: React.FC = () => {
         onBack={() => {
           setShowDetails(false);
           setSelectedReview(null);
+          localStorage.setItem('reviewView', 'list');
+          localStorage.removeItem('selectedReviewId');
         }}
         onEdit={() => {
           setShowDetails(false);
@@ -142,7 +236,11 @@ const ReviewsPage: React.FC = () => {
         </div>
         <div className="mt-4 md:mt-0">
           <button
-            onClick={() => setShowForm(true)}
+            onClick={() => {
+              setShowForm(true);
+              localStorage.setItem('reviewView', 'form');
+              localStorage.setItem('isEditing', 'false');
+            }}
             className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all"
           >
             <Plus className="h-4 w-4 mr-2" />

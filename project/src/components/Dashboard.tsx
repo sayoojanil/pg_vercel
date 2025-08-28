@@ -1,25 +1,34 @@
 import React, { useEffect, useState } from 'react';
-import { Users, DollarSign, Star, Home, TrendingUp, AlertCircle } from 'lucide-react';
-
-interface DashboardProps {
-  onNavigate: (page: string) => void;
-}
+import { Users, DollarSign, Star, Home,User, TrendingUp, AlertCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface CheckIn {
   name: string;
   time: string;
+  joinDate?: string;
+  contact?: string;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
+interface Stat {
+  name: string;
+  value: string;
+  change: string;
+  changeType: 'increase' | 'decrease';
+  icon: React.ComponentType<{ className?: string }>;
+  color: string;
+}
+
+const Dashboard: React.FC = () => {
   const [recentCheckIns, setRecentCheckIns] = useState<CheckIn[]>([
     { name: 'Loading...', time: '' },
   ]);
+  const navigate = useNavigate();
 
   // Fetch recent check-ins from API
   useEffect(() => {
     const fetchRecentCheckIns = async () => {
       try {
-        const response = await fetch('https://api-hammadii-6.onrender.com//getDetailsof/guests', {
+        const response = await fetch('https://api-hammadii-6.onrender.com/getDetailsof/guests', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -31,7 +40,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
         const data = await response.json();
         // Sort in ascending order by time (newest first) and limit to 5
         const sortedData = data
-          .sort((a: CheckIn, b: CheckIn) => 
+          .sort((a: CheckIn, b: CheckIn) =>
             new Date(b.time).getTime() - new Date(a.time).getTime()
 
           )
@@ -48,14 +57,16 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
     fetchRecentCheckIns();
   }, []);
 
-  const stats = [
-    // Stats data remains unchanged
+  const stats: Stat[] = [
+      // Stats data remains unchanged
   ];
 
   const quickActions = [
-    { name: 'Add New Guest', action: () => onNavigate('guests'), icon: Users, color: 'bg-blue-500' },
-    { name: 'Record Payment', action: () => onNavigate('rent'), icon: DollarSign, color: 'bg-green-500' },
-    { name: 'View Reviews', action: () => onNavigate('reviews'), icon: Star, color: 'bg-yellow-500' },
+    { name: 'Add New Guest', action: () => navigate('/guests'), icon: Users, color: 'bg-blue-500' },
+    { name: 'Record Payment', action: () => navigate('/rent'), icon: DollarSign, color: 'bg-green-500' },
+    { name: 'View Reviews', action: () => navigate('/reviews'), icon: Star, color: 'bg-yellow-500' },
+     { name: 'View Profile', action: () => navigate('/profile'), icon: User, color: 'bg-blue-500' },
+
   ];
 
   const recentActivity = [

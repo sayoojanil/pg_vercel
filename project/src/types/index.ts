@@ -25,7 +25,7 @@ export interface Review {
 export interface RentDetail {
   id: string;
   name: string;
-  amount: string;
+  amount: number;
   dueDate: string;
   paymentMethod: string;
   status: 'paid' | 'pending' | 'overdue';

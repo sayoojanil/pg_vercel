@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { User, Lock, Heart } from 'lucide-react';
+import { User, Lock, Heart, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const LoginPage: React.FC = () => {
   // Initialize state with values from localStorage, if available
   const [email, setEmail] = useState(() => localStorage.getItem('loginEmail') || '');
   const [password, setPassword] = useState(() => localStorage.getItem('loginPassword') || '');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState(''); // New state for success message
   const [loginAttempts, setLoginAttempts] = useState(() => 
     parseInt(localStorage.getItem('loginAttempts') || '0', 10)
   );
@@ -48,7 +50,6 @@ const LoginPage: React.FC = () => {
 
   // Handle timeout countdown
   useEffect(() => {
-    // Check if there's a saved timeout end time
     const savedTimeoutEnd = localStorage.getItem('timeoutEnd');
     if (savedTimeoutEnd && isTimedOut) {
       const endTime = parseInt(savedTimeoutEnd, 10);
@@ -58,18 +59,15 @@ const LoginPage: React.FC = () => {
       if (remainingSeconds > 0) {
         setTimeoutSeconds(remainingSeconds);
       } else {
-        // Timeout has expired
         setIsTimedOut(false);
         setLoginAttempts(0);
         setTimeoutSeconds(0);
-        // Clear localStorage when timeout expires
         localStorage.removeItem('loginEmail');
         localStorage.removeItem('loginPassword');
         localStorage.removeItem('loginAttempts');
         localStorage.removeItem('isTimedOut');
         localStorage.removeItem('timeoutSeconds');
         localStorage.removeItem('timeoutEnd');
-        // Don't reset timeoutMultiplier here to maintain progressive lockout
       }
     }
 
@@ -80,7 +78,6 @@ const LoginPage: React.FC = () => {
           if (prev <= 1) {
             setIsTimedOut(false);
             setLoginAttempts(0);
-            // Clear localStorage when timeout expires
             localStorage.removeItem('loginEmail');
             localStorage.removeItem('loginPassword');
             localStorage.removeItem('loginAttempts');
@@ -99,6 +96,7 @@ const LoginPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setSuccess(''); // Clear success message on new submission
 
     if (isTimedOut) {
       setError(`Too many failed attempts. Please wait ${timeoutSeconds} seconds.`);
@@ -112,7 +110,6 @@ const LoginPage: React.FC = () => {
         setIsTimedOut(true);
         const newTimeout = 60 * timeoutMultiplier;
         setTimeoutSeconds(newTimeout);
-        // Save timeout end time
         localStorage.setItem('timeoutEnd', (Date.now() + newTimeout * 1000).toString());
         setTimeoutMultiplier((prev) => prev * 2);
       }
@@ -127,12 +124,11 @@ const LoginPage: React.FC = () => {
         setIsTimedOut(true);
         const newTimeout = 60 * timeoutMultiplier;
         setTimeoutSeconds(newTimeout);
-        // Save timeout end time
         localStorage.setItem('timeoutEnd', (Date.now() + newTimeout * 1000).toString());
         setTimeoutMultiplier((prev) => prev * 2);
       }
     } else {
-      // Clear localStorage on successful login
+      setSuccess('Login successful! Welcome back.'); // Set success message
       localStorage.removeItem('loginEmail');
       localStorage.removeItem('loginPassword');
       localStorage.removeItem('loginAttempts');
@@ -188,13 +184,25 @@ const LoginPage: React.FC = () => {
                 <input
                   id="password"
                   name="password"
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors"
+                  className="pl-10 pr-10 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors"
                   placeholder="********"
                   disabled={isTimedOut}
                 />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  onClick={() => setShowPassword(!showPassword)}
+                  disabled={isTimedOut}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5 text-gray-400" />
+                  ) : (
+                    <Eye className="h-5 w-5 text-gray-400" />
+                  )}
+                </button>
               </div>
             </div>
           </div>
@@ -202,6 +210,12 @@ const LoginPage: React.FC = () => {
           {error && (
             <div className="text-red-600 text-sm text-center bg-red-50 p-2 rounded-lg">
               {error}
+            </div>
+          )}
+          
+          {success && (
+            <div className="text-green-600 text-sm text-center bg-green-50 p-2 rounded-lg">
+              {success}
             </div>
           )}
 

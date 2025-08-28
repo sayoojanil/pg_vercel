@@ -205,6 +205,9 @@ const RentPage: React.FC = () => {
         </div>
       </div>
 
+
+        
+
       <div className="bg-white shadow rounded-lg">
         <div className="p-6 border-b border-gray-200">
           <div className="relative">

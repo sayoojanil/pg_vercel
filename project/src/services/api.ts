@@ -80,7 +80,7 @@ export const rentAPI = {
   },
   
   update: async (id: string, rent: Partial<RentDetail>): Promise<RentDetail | null> => {
-    return apiRequest<RentDetail | null>(`/rent-details/${id}`, 'PUT', rent);
+    return apiRequest<RentDetail | null>(`/payments/${id}`, 'PATCH', rent);
   },
   
   delete: async (id: string): Promise<boolean> => {
