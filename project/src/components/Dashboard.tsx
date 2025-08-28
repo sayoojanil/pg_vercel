@@ -44,7 +44,7 @@ const Dashboard: React.FC = () => {
             new Date(b.time).getTime() - new Date(a.time).getTime()
 
           )
-          .slice(0, 30);
+          .slice(0, 5);
         setRecentCheckIns(sortedData);
       } catch (error) {
         console.error('Error fetching recent check-ins:', error);
@@ -167,7 +167,7 @@ const Dashboard: React.FC = () => {
         {/* Recent Check-Ins */}
         <div className="bg-white shadow rounded-lg">
           <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-medium text-gray-900">Our all guests</h3>
+            <h3 className="text-lg font-medium text-gray-900">Our few guests</h3>
           </div>
           <div className="p-6">
             <div className="flow-root">
@@ -180,8 +180,8 @@ const Dashboard: React.FC = () => {
                       </div>
                       <div className="min-w-0 flex-1">
                         <p className="text-sm text-gray-800">{checkIn.name}</p>
-                        <p className="text-sm text-gray-500">Joined at: {checkIn.joinDate}</p>
-                         <p className="text-sm text-gray-500">Contact : {checkIn.contact}</p>
+                        <p className="text-sm text-gray-500">Check In   : {checkIn.joinDate}</p>
+                         <p className="text-sm text-gray-500">Phone : {checkIn.contact}</p>
                       </div>
                     </div>
                   </li>
