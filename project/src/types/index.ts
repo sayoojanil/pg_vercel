@@ -9,6 +9,10 @@ export interface Guest {
   emergencyContactName: string;
   emergencyContactRelation: string;
   email: string;
+  amountPaid:string;
+  paymentCycle:string;
+  status:string;
+  occupationCourse:string;
   joinDate: string;
   occupation: string;
   emergencyContactNumber: string;
