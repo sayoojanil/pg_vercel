@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Users, DollarSign, Star, Home,User, TrendingUp, AlertCircle } from 'lucide-react';
+import { Users, DollarSign, Star,User, TrendingUp, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface CheckIn {

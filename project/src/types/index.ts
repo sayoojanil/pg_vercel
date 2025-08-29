@@ -1,15 +1,23 @@
 export interface Guest {
   id: string;
   name: string;
+  contact: string;
+  location: string;
+  dob: string;
+  guardianName: string;
+  guardianContact: string;
+  emergencyContactName: string;
+  emergencyContactRelation: string;
   email: string;
-  phone: string;
-  roomNumber: string;
   joinDate: string;
   occupation: string;
-  emergencyContact: string;
+  emergencyContactNumber: string;
   depositAmount: number;
-  status: 'active' | 'inactive';
-  photo?: string;
+  foodPreference: string;
+  stayStatus: string;
+  expectedDateFrom: string;
+  expectedDateTo: string;
+  fileUrl?: string;
 }
 
 export interface Review {
@@ -26,7 +34,7 @@ export interface RentDetail {
   id: string;
   name: string;
   amount: number;
-  dueDate: string;
+  duedate: string;
   paymentMethod: string;
   status: 'paid' | 'pending' | 'overdue';
   notes: string;
@@ -39,4 +47,4 @@ export interface User {
   name: string;
 } 
 
-// hai
+// hai  

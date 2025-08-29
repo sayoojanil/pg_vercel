@@ -281,11 +281,11 @@ const RentPage: React.FC = () => {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm text-gray-900">
-                            ₹{(rent.amount + (rent.additionalCharges || 0)).toLocaleString()}
+                            ₹{(rent.amount ).toLocaleString()}
                           </div>
-                          {rent.additionalCharges && (
+                          {rent.amount && (
                             <div className="text-xs text-gray-500">
-                              Base: ₹{rent.monthlyRent.toLocaleString()} + Additional: ₹{rent.additionalCharges.toLocaleString()}
+                              Base: ₹{rent.amount.toLocaleString()} 
                             </div>
                           )}
                         </td>

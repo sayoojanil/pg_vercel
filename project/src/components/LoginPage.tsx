@@ -188,7 +188,7 @@ const LoginPage: React.FC = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="pl-10 pr-10 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors"
-                  placeholder="********"
+                  placeholder="***********"
                   disabled={isTimedOut}
                 />
                 <button

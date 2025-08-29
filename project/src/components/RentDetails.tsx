@@ -2,6 +2,7 @@ import React from 'react';
 import { ArrowLeft, Edit, DollarSign, Calendar, User, CreditCard, FileText, AlertCircle } from 'lucide-react';
 
 interface RentDetail {
+  id:string;
   name: string;
   amount: number;
   status: string;

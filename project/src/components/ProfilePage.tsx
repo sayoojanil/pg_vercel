@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { User, Mail, Hash, Lock } from 'lucide-react';
+import { User, Mail, Hash,  } from 'lucide-react';
 
 const ProfilePage: React.FC = () => {
   const { user } = useAuth();
@@ -45,15 +45,7 @@ const ProfilePage: React.FC = () => {
                 {user?.name || 'N/A'}
               </dd>
             </div>
-            <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-              <dt className="text-sm font-medium text-gray-500 flex items-center">
-                <Lock className="h-4 w-4 mr-2 text-gray-400" />
-                Password
-              </dt>
-              <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                {user?.password || 'N/A'}
-              </dd>
-            </div>
+           
             <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
               <dt className="text-sm font-medium text-gray-500 flex items-center">
                 <Mail className="h-4 w-4 mr-2 text-gray-400" />
