@@ -67,16 +67,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const logout = () => {
-    setUser(null);
-    localStorage.removeItem('user');
-    // Optional: Make API call to invalidate session
-    fetch('https://api-hammadii-6.onrender.com/loginWithEmail', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }).catch(error => console.error('Logout error:', error));
-  };
+  const confirmLogout = window.confirm("Are you sure you want to log out?");
+  if (!confirmLogout) return;
+
+  setUser(null);
+  localStorage.removeItem('user');
+  // Optional: Make API call to invalidate session
+  fetch('https://api-hammadii-6.onrender.com/logout', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  }).catch(error => console.error('Logout error:', error));
+};
+
 
   const value = {
     user,

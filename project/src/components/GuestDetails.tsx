@@ -327,18 +327,23 @@ const GuestDetails: React.FC<GuestDetailsProps> = ({ guest, onBack, onEdit }) =>
                     </div>
                   </div>
 
-                  <div className="flex items-center space-x-3">
-                    <FileText className="h-5 w-5 text-gray-400" />
-                    <div>
-                      <p className="text-sm text-gray-500">Document</p>
-                      <a
-                        href={guest.fileUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:underline"
-                      >
-                        View Document
-                      </a>
+                  <div className="space-y-2">
+                    <div className="flex items-center space-x-3">
+                      <FileText className="h-5 w-5 text-gray-400" />
+                      <div>
+                        <p className="text-sm text-gray-500">Document</p>
+                      </div>
+                    </div>
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      {guest.fileUrl ? (
+                        <iframe
+                          src={guest.fileUrl}
+                          className="w-full h-[600px] border border-gray-200 rounded-md"
+                          title="Guest Document"
+                        />
+                      ) : (
+                        <p className="text-gray-500">No document available</p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -350,7 +355,9 @@ const GuestDetails: React.FC<GuestDetailsProps> = ({ guest, onBack, onEdit }) =>
                   <div className="text-center">
                     <p className="text-2xl font-bold text-blue-600">
                       {Math.floor(
-                        (new Date().getTime() - new Date(guest.joinDate).getTime()) /
+                        (new
+
+ Date().getTime() - new Date(guest.joinDate).getTime()) /
                           (1000 * 60 * 60 * 24)
                       )}
                     </p>

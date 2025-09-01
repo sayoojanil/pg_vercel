@@ -26,6 +26,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     setIsMobileMenuOpen(false);
   };
 
+
   const getCurrentPage = () => {
     const path = location.pathname;
     if (path === '/' || path === '/dashboard') return '/dashboard';
@@ -84,6 +85,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               </div>
               
               <button
+
+                 
+              
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 className="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
               >
