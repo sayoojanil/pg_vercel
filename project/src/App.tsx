@@ -1,4 +1,4 @@
-import React from 'react';
+// import React from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from './components/LoginPage';
@@ -8,6 +8,8 @@ import GuestsPage from './components/GuestsPage';
 import ReviewsPage from './components/ReviewsPage';
 import RentPage from './components/RentPage';
 import ProfilePage from './components/ProfilePage';
+import AboutPage from './components/AboutPage';
+
 
 function AppContent() {
   const { user } = useAuth();
@@ -25,6 +27,7 @@ function AppContent() {
         <Route path="/reviews" element={<ReviewsPage />} />
         <Route path="/rent" element={<RentPage />} />
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/about" element={<AboutPage />} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </Layout>

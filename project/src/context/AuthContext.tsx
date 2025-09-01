@@ -67,18 +67,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const logout = () => {
-  const confirmLogout = window.confirm("Are you sure you want to log out?");
+  const confirmLogout = window.confirm("Hey admin are you sure you want to log out?");  
+  // setTimeout(() => confirm("sure log out?"), 1000);
+
   if (!confirmLogout) return;
 
   setUser(null);
   localStorage.removeItem('user');
   // Optional: Make API call to invalidate session
-  fetch('https://api-hammadii-6.onrender.com/logout', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  }).catch(error => console.error('Logout error:', error));
+  // fetch('https://api-hammadii-6.onrender.com/logout', {
+  //   method: 'POST',
+  //   headers: {
+  //     'Content-Type': 'application/json',
+  //   },
+  // }).catch(error => console.error('Logout error:', error));
 };
 
 

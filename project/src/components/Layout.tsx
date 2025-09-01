@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Menu, X, LogOut, Home, Users, DollarSign, Star, User } from 'lucide-react';
+import { Menu, X, LogOut, Home,Book, Users, DollarSign, Star, User } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -19,6 +19,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     { name: 'Rent Details', icon: DollarSign, path: '/rent' },
     { name: 'Reviews', icon: Star, path: '/reviews' },
     { name: 'Profile', icon: User, path: '/profile' },
+    { name: 'About ', icon: Book, path: '/about' },
+
   ];
 
   const handleNavigation = (path: string) => {
