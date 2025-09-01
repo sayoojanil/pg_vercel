@@ -58,6 +58,9 @@ const RentDetails: React.FC<RentDetailsProps> = ({ rent, onBack, onEdit }) => {
             <p className="mt-1 text-sm text-gray-500">
               {new Date(rent.date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })} - {rent.name}
             </p>
+            <p className="mt-1 text-sm text-gray-500">
+              Guest Id : {rent.id}
+            </p>
           </div>
         </div>
         <button
@@ -98,14 +101,15 @@ const RentDetails: React.FC<RentDetailsProps> = ({ rent, onBack, onEdit }) => {
                     <div>
                       <p className="text-sm text-gray-500">Guest Name</p>
                       <p className="text-gray-900 font-medium">{rent.name}</p>
+                      
                       <div>
-                        <div className="space-y-4">
+                        {/* <div className="space-y-4">
 
                         <div className="flex items-center space-x-3">
-                    <User className="h-5 w-5 text-gray-400" />
+                    <Pen className="h-5 w-5 text-gray-400" />
                         
                           <p className="text-sm text-gray-500">Guest Id</p>
-                      <p className="text-gray-900 font-medium">{rent.id}</p>
+                      <p className="text-gray-900 font-medium">{rent.id}</p> */}
                       </div>
                     </div>
                     </div>
@@ -242,8 +246,8 @@ const RentDetails: React.FC<RentDetailsProps> = ({ rent, onBack, onEdit }) => {
             </div>
           </div>
         </div>
-      </div>
-    </div>
+    //   </div>
+    // </div>
   );
 };
 
