@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { User, Lock, Heart, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import emailjs from '@emailjs/browser';
+import { text } from 'framer-motion/client';
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState(() => localStorage.getItem('loginEmail') || '');
@@ -193,13 +194,18 @@ const LoginPage: React.FC = () => {
           {error && <div className="text-red-600 text-sm text-center bg-red-50 p-2 rounded-lg">{error}</div>}
           {success && <div className="text-green-600 text-sm text-center bg-green-50 p-2 rounded-lg">{success}</div>}
 
-          <button
-            type="submit"
-            disabled={isLoading || isTimedOut}
-            className="w-full py-2 px-4 rounded-lg text-white font-medium bg-gradient-to-r from-blue-500 to-purple-600 disabled:opacity-50"
-          >
-            {isLoading ? 'Signing in...' : isTimedOut ? `Locked! Wait ${timeoutSeconds}s` : 'Sign In'}
-          </button>
+         <button
+  type="submit"
+  disabled={isLoading || isTimedOut || !email || !password}  //disabl buton when email and password is not there
+  className="w-full py-2 px-4 rounded-lg text-white font-medium bg-gradient-to-r from-blue-500 to-purple-600 disabled:opacity-50"
+>
+  {isLoading
+    ? 'Signing in...'
+    : isTimedOut
+    ? `Locked! Wait ${timeoutSeconds}s`
+    : 'Sign In'}
+</button>
+
         </form>
       </div>
     </div>
