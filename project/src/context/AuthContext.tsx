@@ -42,7 +42,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (email: string, password: string): Promise<boolean> => {
     setIsLoading(true);
     try {
-      const response = await fetch('https:/api-hammadii-6.onrender.com/loginWithEmail', {
+      const response = await fetch('https://api-hammadii-6.onrender.com/loginWithEmail', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
