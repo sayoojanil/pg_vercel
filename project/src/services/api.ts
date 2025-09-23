@@ -54,6 +54,7 @@ export const reviewAPI = {
   },
 
   getById: async (id: string): Promise<Review | null> => {
+    
     return apiRequest<Review | null>(`/reviews/${id}`);
   },
 

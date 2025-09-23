@@ -202,7 +202,7 @@ const LoginPage: React.FC = () => {
   {isLoading
     ? 'Signing in...'
     : isTimedOut
-    ? `Locked! Wait ${timeoutSeconds}s`
+    ? `Three failed attempts. Wait.. ${timeoutSeconds}s`
     : 'Sign In'}
 </button>
 

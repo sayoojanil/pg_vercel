@@ -52,6 +52,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       if (!response.ok) {
         throw new Error('Authentication failed');
+        
       }
 
       const userData: User = await response.json();
@@ -60,6 +61,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return true;
     } catch (error) {
       console.error('Login error:', error);
+      document.title = 'Login Failed';
       return false;
     } finally {
       setIsLoading(false);
