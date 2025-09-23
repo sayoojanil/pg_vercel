@@ -40,40 +40,33 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
-  setIsLoading(true);
-  const controller = new AbortController();
-  const signal = controller.signal;
+    setIsLoading(true);
+    try {
+      const response = await fetch('https://api-hammadii-6.onrender.com/loginWithEmail', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-  // Abort immediately (timeout = 0)
-  controller.abort();
+      if (!response.ok) {
+        throw new Error('Authentication failed');
+        
+      }
 
-  try {
-    const response = await fetch('https://api-hammadii-6.onrender.com/loginWithEmail', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, password }),
-      signal,
-    });
-
-    if (!response.ok) {
-      throw new Error('Authentication failed');
+      const userData: User = await response.json();
+      setUser(userData);
+      localStorage.setItem('user', JSON.stringify(userData));
+      return true;
+    } catch (error) {
+      console.error('Login error:', error);
+      document.title = 'Login Failed';
+      return false;
+    } finally {
+      setIsLoading(false);
     }
-
-    const userData: User = await response.json();
-    setUser(userData);
-    localStorage.setItem('user', JSON.stringify(userData));
-    return true;
-  } catch (error) {
-    console.error('Login error (timeout or auth failed):', error);
-    document.title = 'Login Failed';
-    return false;
-  } finally {
-    setIsLoading(false);
-  }
-};
-
+  };
 
   const logout = () => {
   const confirmLogout = window.confirm("Hey admin are you sure you want to log out?");  
