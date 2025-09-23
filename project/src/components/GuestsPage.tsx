@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Search, Edit, Eye, Phone, Mail, User, Calendar, MapPin, ChevronLeft, ChevronRight } from 'lucide-react';
+import { 
+  Plus, Search, Edit, Eye, Phone, Mail, User, Calendar, 
+  MapPin, ChevronLeft, ChevronRight 
+} from 'lucide-react';
 import { Guest } from '../types';
 import { guestAPI } from '../services/api';
 import GuestForm from './GuestForm';
@@ -14,7 +17,8 @@ const GuestsPage: React.FC = () => {
   const [selectedGuest, setSelectedGuest] = useState<Guest | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(6); // Number of guests per page
+  const [itemsPerPage] = useState(6);
+  const [detailsLoading, setDetailsLoading] = useState(false);
 
   useEffect(() => {
     loadGuests();
@@ -37,7 +41,7 @@ const GuestsPage: React.FC = () => {
       await guestAPI.create(guestData);
       await loadGuests();
       setShowForm(false);
-      setCurrentPage(1); // Reset to first page after adding
+      setCurrentPage(1);
     } catch (error) {
       console.error('Failed to add guest:', error);
     }
@@ -58,10 +62,17 @@ const GuestsPage: React.FC = () => {
   };
 
   const handleViewDetails = async (guest: Guest) => {
-    const fullGuest = await guestAPI.getById(guest.id);
-    if (fullGuest) {
-      setSelectedGuest(fullGuest);
-      setShowDetails(true);
+    setDetailsLoading(true);
+    setShowDetails(true);
+    try {
+      const fullGuest = await guestAPI.getById(guest.id);
+      if (fullGuest) {
+        setSelectedGuest(fullGuest);
+      }
+    } catch (error) {
+      console.error("Failed to fetch guest details:", error);
+    } finally {
+      setDetailsLoading(false);
     }
   };
 
@@ -77,7 +88,6 @@ const GuestsPage: React.FC = () => {
     guest.id.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Pagination calculations
   const totalPages = Math.ceil(filteredGuests.length / itemsPerPage);
   const paginatedGuests = filteredGuests.slice(
     (currentPage - 1) * itemsPerPage,
@@ -90,6 +100,7 @@ const GuestsPage: React.FC = () => {
     }
   };
 
+  // ---------- CONDITIONAL RENDERS ----------
   if (showForm) {
     return (
       <GuestForm
@@ -104,7 +115,20 @@ const GuestsPage: React.FC = () => {
     );
   }
 
-  if (showDetails && selectedGuest) {
+  if (showDetails) {
+    if (detailsLoading || !selectedGuest) {
+      return (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-50 bg-opacity-80 z-50">
+          <div className="flex flex-col items-center space-y-4 animate-fade-in">
+            {/* Spinner */}
+            <div className="h-12 w-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+            {/* Text */}
+            <p className="text-gray-700 font-medium">Loading guest details...</p>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <GuestDetails
         guest={selectedGuest}
@@ -120,6 +144,7 @@ const GuestsPage: React.FC = () => {
     );
   }
 
+  // ---------- MAIN PAGE ----------
   return (
     <div className="space-y-6">
       <div className="md:flex md:items-center md:justify-between">
