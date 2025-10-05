@@ -25,7 +25,7 @@ const RentDetails: React.FC<RentDetailsProps> = ({ rent, onBack, onEdit }) => {
       case 'paid': return 'bg-green-500';
       case 'pending': return 'bg-yellow-500';
       case 'overdue': return 'bg-red-500';
-      case 'Awaiting_payment': return 'bg-red-600';
+      case 'Awaiting_payment': return 'bg-red-600'; 
 
       default: return 'bg-gray-500';
     }
